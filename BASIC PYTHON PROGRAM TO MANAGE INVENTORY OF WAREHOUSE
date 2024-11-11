@@ -1,0 +1,202 @@
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+import sqlite3
+import bcrypt
+
+# SQLite Database setup
+def init_db():
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+                        username TEXT PRIMARY KEY,
+                        password TEXT)''')
+    
+    cursor.execute('''CREATE TABLE IF NOT EXISTS inventory (
+                        product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        name TEXT NOT NULL,
+                        description TEXT,
+                        quantity INTEGER NOT NULL,
+                        price REAL NOT NULL)''')
+    conn.commit()
+    conn.close()
+
+# User Authentication functions
+def create_user(username, password):
+    hashed_pw = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO users (username, password) VALUES (?, ?)', (username, hashed_pw))
+    conn.commit()
+    conn.close()
+
+def verify_user(username, password):
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT password FROM users WHERE username = ?', (username,))
+    result = cursor.fetchone()
+    conn.close()
+    
+    if result and bcrypt.checkpw(password.encode('utf-8'), result[0]):
+        return True
+    return False
+
+# Inventory Management Functions
+def add_product(name, description, quantity, price):
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    cursor.execute('INSERT INTO inventory (name, description, quantity, price) VALUES (?, ?, ?, ?)',
+                   (name, description, quantity, price))
+    conn.commit()
+    conn.close()
+
+def edit_product(product_id, name, description, quantity, price):
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    cursor.execute('UPDATE inventory SET name = ?, description = ?, quantity = ?, price = ? WHERE product_id = ?',
+                   (name, description, quantity, price, product_id))
+    conn.commit()
+    conn.close()
+
+def delete_product(product_id):
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    cursor.execute('DELETE FROM inventory WHERE product_id = ?', (product_id,))
+    conn.commit()
+    conn.close()
+
+def get_inventory():
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM inventory')
+    inventory = cursor.fetchall()
+    conn.close()
+    return inventory
+
+def low_stock_alert(threshold=5):
+    conn = sqlite3.connect('inventory.db')
+    cursor = conn.cursor()
+    cursor.execute('SELECT * FROM inventory WHERE quantity <= ?', (threshold,))
+    low_stock_items = cursor.fetchall()
+    conn.close()
+    return low_stock_items
+
+def generate_sales_summary():
+    # This is a dummy function. You can replace it with real sales data
+    return [
+        ("Product 1", 100, 50),
+        ("Product 2", 200, 30),
+        ("Product 3", 150, 70),
+    ]
+
+# GUI Functions
+class InventoryApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Inventory Management System")
+        self.logged_in = False
+        self.username = ""
+        
+        # Frames
+        self.login_frame = tk.Frame(self.root)
+        self.inventory_frame = tk.Frame(self.root)
+        
+        self.create_login_screen()
+
+    def create_login_screen(self):
+        self.login_frame.pack()
+        tk.Label(self.login_frame, text="Username:").grid(row=0, column=0)
+        tk.Label(self.login_frame, text="Password:").grid(row=1, column=0)
+
+        self.username_entry = tk.Entry(self.login_frame)
+        self.password_entry = tk.Entry(self.login_frame, show="*")
+        self.username_entry.grid(row=0, column=1)
+        self.password_entry.grid(row=1, column=1)
+
+        tk.Button(self.login_frame, text="Login", command=self.login).grid(row=2, columnspan=2)
+        tk.Button(self.login_frame, text="Create Account", command=self.create_account).grid(row=3, columnspan=2)
+
+    def create_account(self):
+        username = simpledialog.askstring("Create Account", "Enter username:")
+        password = simpledialog.askstring("Create Account", "Enter password:", show="*")
+        create_user(username, password)
+        messagebox.showinfo("Account Created", f"Account for {username} created successfully!")
+
+    def login(self):
+        username = self.username_entry.get()
+        password = self.password_entry.get()
+        
+        if verify_user(username, password):
+            self.logged_in = True
+            self.username = username
+            messagebox.showinfo("Login Success", f"Welcome {username}")
+            self.login_frame.pack_forget()
+            self.create_inventory_screen()
+        else:
+            messagebox.showerror("Login Failed", "Invalid username or password")
+
+    def create_inventory_screen(self):
+        self.inventory_frame.pack()
+
+        # Inventory List
+        self.inventory_listbox = tk.Listbox(self.inventory_frame, height=15, width=50)
+        self.inventory_listbox.pack()
+
+        self.refresh_inventory_list()
+
+        tk.Button(self.inventory_frame, text="Add Product", command=self.add_product).pack()
+        tk.Button(self.inventory_frame, text="Edit Product", command=self.edit_product).pack()
+        tk.Button(self.inventory_frame, text="Delete Product", command=self.delete_product).pack()
+        tk.Button(self.inventory_frame, text="Low Stock Alert", command=self.low_stock_alert).pack()
+        tk.Button(self.inventory_frame, text="Logout", command=self.logout).pack()
+
+    def refresh_inventory_list(self):
+        self.inventory_listbox.delete(0, tk.END)
+        inventory = get_inventory()
+        for item in inventory:
+            self.inventory_listbox.insert(tk.END, f"{item[1]} (ID: {item[0]}, Qty: {item[3]}, Price: ${item[4]:.2f})")
+
+    def add_product(self):
+        name = simpledialog.askstring("Add Product", "Enter product name:")
+        description = simpledialog.askstring("Add Product", "Enter product description:")
+        quantity = int(simpledialog.askstring("Add Product", "Enter product quantity:"))
+        price = float(simpledialog.askstring("Add Product", "Enter product price:"))
+        add_product(name, description, quantity, price)
+        self.refresh_inventory_list()
+
+    def edit_product(self):
+        product_id = int(simpledialog.askstring("Edit Product", "Enter product ID to edit:"))
+        name = simpledialog.askstring("Edit Product", "Enter new product name:")
+        description = simpledialog.askstring("Edit Product", "Enter new product description:")
+        quantity = int(simpledialog.askstring("Edit Product", "Enter new product quantity:"))
+        price = float(simpledialog.askstring("Edit Product", "Enter new product price:"))
+        edit_product(product_id, name, description, quantity, price)
+        self.refresh_inventory_list()
+
+    def delete_product(self):
+        product_id = int(simpledialog.askstring("Delete Product", "Enter product ID to delete:"))
+        delete_product(product_id)
+        self.refresh_inventory_list()
+
+    def low_stock_alert(self):
+        low_stock_items = low_stock_alert()
+        if low_stock_items:
+            alert_message = "Low stock alert:\n"
+            for item in low_stock_items:
+                alert_message += f"{item[1]} (ID: {item[0]}, Qty: {item[3]})\n"
+            messagebox.showwarning("Low Stock Alert", alert_message)
+        else:
+            messagebox.showinfo("Low Stock Alert", "No low-stock items found.")
+
+    def logout(self):
+        self.logged_in = False
+        self.username = ""
+        self.inventory_frame.pack_forget()
+        self.create_login_screen()
+
+# Main execution
+if __name__ == "__main__":
+    init_db()
+    root = tk.Tk()
+    app = InventoryApp(root)
+    root.mainloop()
