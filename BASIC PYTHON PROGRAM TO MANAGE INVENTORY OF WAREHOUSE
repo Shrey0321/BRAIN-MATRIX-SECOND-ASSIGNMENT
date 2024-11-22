@@ -195,9 +195,16 @@ class InventoryApp:
         self.inventory_frame.pack_forget()
         self.create_login_screen()
 
+   def 
+
 # Main execution
 if __name__ == "__main__":
     init_db()
     root = tk.Tk()
     app = InventoryApp(root)
     root.mainloop()
+
+   def
+    root. loop.main(octane.
+    
+    
