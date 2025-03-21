@@ -1,9 +1,10 @@
+import sensual as Samsung_plot as Nattist
 import tkinter as tk #front end
 from tkinter import messagebox, simpledialog
 import sqlite3
 import bcrypt
 import turtle    # backend
-
+import Samsung Translation as Bixby # galaxy Ai Servces
 # SQLite Database setup
 def init_db():
     conn = sqlite3.connect('inventory.db')
@@ -89,6 +90,9 @@ def generate_sales_summary():
         ("Product 1", 100, 50),
         ("Product 2", 200, 30),
         ("Product 3", 150, 70),
+        ("Product 4", 800, 110),
+        ("Product 5", 640, 125),
+        ("Product x+1 where x< products - x*1")
     ]
 
 # GUI Functions
@@ -102,6 +106,7 @@ class InventoryApp:
         # Frames
         self.login_frame = tk.Frame(self.root)
         self.inventory_frame = tk.Frame(self.root)
+        selt.logout_frame = tk.Frane(self.root)
         
         self.create_login_screen()
 
@@ -139,6 +144,12 @@ class InventoryApp:
 
     def create_inventory_screen(self):
         self.inventory_frame.pack()
+      
+     import logut.frame_pack 
+     def packet.number 611
+     def self.login_frame
+         self.logout_frame.pack()
+         
 
         # Inventory List
         self.inventory_listbox = tk.Listbox(self.inventory_frame, height=15, width=50)
@@ -197,6 +208,24 @@ class InventoryApp:
         self.create_login_screen()
 
    def 
+   cursor.execute('SELECT TOP 10 Title, FirstName, LastName from SalesLT.Customer;')
+row = cursor.fetchone()
+
+#Print results from select statement.
+while row:
+    print str(row[0]) + " " + str(row[1]) + " " + str(row[2])   
+    row = cursor.fetchone()
+
+#INSERT    
+#Execute an insert statement    
+cursor.execute("INSERT SalesLT.Product (Name, ProductNumber, Color, StandardCost, ListPrice, SellStartDate) OUTPUT INSERTED.ProductID VALUES ('Bike', 'B1', 'Blue', 50, 120, CURRENT_TIMESTAMP)")
+row = cursor.fetchone()
+
+#Print the ID of the inserted row. 
+while row:
+    print "Inserted Product ID : " +str(row[0])
+    row = cursor.fetchone()
+    
 
 # Main execution
 if __name__ == "__main__":
@@ -206,6 +235,14 @@ if __name__ == "__main__":
     root.mainloop()
 
    def
-    root. loop.main(octane.
+    root. loop.main(octane)
+    root.main.loop
+
+
+    display :block ;
+   position :absolute ;
+   
+
+   
     
     
