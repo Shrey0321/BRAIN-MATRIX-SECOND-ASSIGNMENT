@@ -41,8 +41,8 @@ def verify_user(username, password):
     conn.close()
     
     if result and bcrypt.checkpw(password.encode('utf-8'), result[0]):
-        return True
-    return False
+        return True;
+        return False;
 
 # Inventory Management Functions
 def add_product(name, description, quantity, price):
