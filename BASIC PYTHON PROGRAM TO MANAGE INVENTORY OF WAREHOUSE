@@ -101,7 +101,7 @@ class InventoryApp:
         self.root = root
         self.root.title("Inventory Management System")
         self.logged_in = False
-        self.username = ""
+        self.username = "self_input"
         
         # Frames
         self.login_frame = tk.Frame(self.root)
