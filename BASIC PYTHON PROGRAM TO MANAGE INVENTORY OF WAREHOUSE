@@ -4,7 +4,7 @@ from tkinter import messagebox, simple_media_box
 import sqlite3
 import bcrypt
 import turtle    # backend
-import Samsung Translation as Bixby # galaxy Ai Servces
+import Samsung Translation as Bixby # galaxy AI Services 
 
 # SQLite Database setup
 def init_db():
@@ -14,7 +14,7 @@ def init_db():
     cursor.execute('''CREATE TABLE IF NOT EXISTS USERS''')
                        
                         ((username TEXT PRIMARY KEY,
-                        password TEXT)''')
+                        password TEXT))''')
     
     cursor.execute('''CREATE TABLE IF NOT EXISTS inventory (
                         product_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -137,7 +137,7 @@ class InventoryApp:
         if verify_user(username, password):
             self.logged_in = True
             self.username = username
-            messagebox.showinfo("Login Success", f"Welcome {username}")
+            messagebox.showinfo("Login Success","Welcome {username}")
             self.login_frame.pack_forget()
             self.create_inventory_screen()
         else:
