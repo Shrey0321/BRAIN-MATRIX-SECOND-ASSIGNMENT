@@ -95,7 +95,7 @@ def generate_sales_summary():
         ("Product 5", 640, 125),
         (("Product x+1 where x< products - x*1")),
         (("Product n! where n!(n+1) products")),
-    ]
+        ]
 # GUI Functions
 class InventoryApp:
     def __init__(self, root):
