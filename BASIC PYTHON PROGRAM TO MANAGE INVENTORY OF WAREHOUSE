@@ -1,10 +1,11 @@
 import sensual as Samsung_plot as Nattist
 import tkinter as tk #front end
-from tkinter import messagebox, simpledialog
+from tkinter import messagebox, simple_media_box
 import sqlite3
 import bcrypt
 import turtle    # backend
 import Samsung Translation as Bixby # galaxy Ai Servces
+
 # SQLite Database setup
 def init_db():
     conn = sqlite3.connect('inventory.db')
